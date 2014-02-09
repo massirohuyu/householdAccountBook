@@ -1,0 +1,266 @@
+#login-info {
+  text-align: right;
+}
+
+.calendarContainer {
+  padding: 10px 10px 100px;
+}
+
+.account-control {
+  /*float: left;*/
+}
+
+.account-control button {
+  background: #aaa;
+  border-radius: 4px;
+  padding: 6px 18px;
+  color: #FFF;
+  box-shadow: none;
+  border: none;
+  font-size: 14px;
+  vertical-align: middle;
+  font-weight: normal;
+  line-height: 1.4;
+  cursor: pointer;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.account-control button.active {
+  background: #fa8072;
+}
+
+.account-control button:hover {
+  background: #fa8072;
+}
+
+.calendar-control {
+  float: right;
+}
+
+.calendar-control button {
+  background: #428bca;
+  border-radius: 4px;
+  padding: 6px 18px;
+  color: #FFF;
+  box-shadow: none;
+  border: none;
+  font-size: 14px;
+  vertical-align: middle;
+  font-weight: normal;
+  line-height: 1.4;
+  cursor: pointer;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.calendar-control button:hover {
+  background: #3276b1;
+}
+
+.calendar-control button.calendar-incomeBtn,
+.calendar-control button.calendar-expendBtn {
+  background: #5cb85c;
+}
+
+.calendar-control button.calendar-incomeBtn:hover,
+.calendar-control button.calendar-expendBtn:hover {
+  background: #47a447;
+}
+
+.calendar {
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.calendar caption {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.calendar thead th {
+  background: #888;
+  color: #FFF;
+}
+
+.calendar td,
+.calendar th {
+  border: 1px solid #666;
+}
+
+.calendar td {
+  vertical-align: top;
+  padding: 5px;
+  font-size: 13px;
+}
+
+.calendar td.incomeAmount,
+.calendar span.Sat {
+  color: #4169e1;
+}
+
+.calendar td.expendAmount,
+.calendar span.Sun {
+  color: #ff4500;
+}
+
+.calendar td {
+  cursor: pointer;
+}
+
+.calendar tr:hover {
+  color: #6b87ff;
+  text-decoration: underline;
+}
+
+.calendar .calendar-date {
+  color: #999;
+  margin-bottom: 3px;
+}
+
+.calendar .calendar-list time {
+  display: inline-block;
+  margin-right: 5px;
+  font-size: 11px;
+  font-weight: bold;
+}
+.calendar .calendar-list span {
+  display: inline-block;
+}
+
+.dialog {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.dialog .dialog-body {
+  position: relative;
+  height: 80%;
+  width: 450px;
+  overflow: auto;
+  border-radius: 6px;
+  padding: 15px;
+  margin: 50px auto 0;
+  background: #FFF;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.dialog .dialog-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  color: #6b87ff;
+}
+
+.dialog .dialog-close:hover {
+  color: #ff5268;
+}
+
+.dialog-body {
+}
+
+.dialog h3 {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 15px 0 0;
+}
+
+.dialog p {
+  margin: 2px 0;
+}
+
+.dialog input[type="text"] {
+  width: 100%;
+  font-size: 14px;
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
+}
+
+.dialog input[type="datetime-local"] {
+  font-size: 14px;
+}
+
+.dialog .dialog-controll {
+  margin-top: 25px;
+}
+
+.dialog .dialog-controll input[type="submit"],
+.dialog .dialog-controll button {
+  border-radius: 4px;
+  padding: 6px 18px;
+  color: #FFF;
+  box-shadow: none;
+  border: none;
+  font-size: 14px;
+  vertical-align: middle;
+  font-weight: normal;
+  line-height: 1.4;
+  cursor: pointer;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.dialog .dialog-controll input[type="submit"] {
+  background: #5cb85c;
+  margin-right: 10px;
+}
+
+.dialog .dialog-controll input[type="submit"]:hover {
+  background: #47a447;
+}
+
+.dialog .dialog-controll button.dialog-removeBtn {
+  background: #d9534f;
+}
+
+.dialog .dialog-controll button.dialog-removeBtn:hover {
+  background: #d2322d;
+}
+
+.dialog .dialog-controll button.dialog-copyBtn {
+  background: #428bca;
+}
+
+.dialog .dialog-controll button.dialog-copyBtn:hover {
+  background: #3276b1;
+}
+
+.dialog .shopList button {
+  background: #aaa;
+  border-radius: 4px;
+  padding: 6px 18px;
+  color: #FFF;
+  box-shadow: none;
+  border: none;
+  font-size: 12px;
+  vertical-align: middle;
+  font-weight: normal;
+  line-height: 1.4;
+  cursor: pointer;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.dialog .shopList button.active {
+  background: #fa8072;
+}
+
+.dialog .shopList button:hover {
+  background: #fa8072;
+}
