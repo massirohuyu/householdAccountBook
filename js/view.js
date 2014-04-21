@@ -7,7 +7,7 @@
 //  },
 //  onSubmit: function(e) {
 //    e.preventDefault();
-//    
+//
 //    var amount = this.$('input[name="amount"]').val();
 //    var date = this.$('input[name="date"]').val();
 //    var section = this.$('select[name="section"]').val();
@@ -18,7 +18,7 @@
 //    var isIncome = this.$('input[name="isIncome"]').val();
 //    var debitDay = this.$('select[name="debitDay"]').val();
 //    var shop = this.$('input[name="shop"]').val();
-//    
+//
 //    this.collection.add({
 //      'amount': amount,
 //      'date': moment(date),
@@ -45,7 +45,7 @@ App.CalendarView = Backbone.View.extend({
   },
   render: function() {
     if(!this.current) return true;
-    
+
     var $caption = this.$('caption');
     var $tbody = this.$('tbody');
     var currentDay = this.current.clone().startOf('month').startOf('week');
@@ -53,24 +53,24 @@ App.CalendarView = Backbone.View.extend({
 
     $tbody.empty();
     $caption.text( this.current.format('YYYY年MM月') );
-    
+
     var actions = this.collection.findActions(this.account, this.current);
     var allActions = this.collection.findActions(this.account);
     var total = 0;
     var allTotal = 0;
     var sign = '';
-    
+
     _.each(actions, function(model) {
       var actionView = new App.ActionView({
         model: model
       });
       actionView.$el.appendTo($tbody);
-      
+
       total += Number(model.get('isIncome')? model.get('amount'): 0-model.get('amount'));
     });
     sign = total < 0 ? 'expendAmount' : 'incomeAmount';
     $tbody.append('<tr><td>月合計</td><td class="' + sign + '">' + App.formatAmount(total) + '</td></tr>');
-    
+
     _.each(allActions, function(model) {
       allTotal += Number(model.get('isIncome')? model.get('amount'): 0-model.get('amount'));
     });
@@ -124,26 +124,26 @@ App.SectionListView = Backbone.View.extend({
   },
   render: function() {
     if(!this.current) return true;
-    
+
     var $tbody = this.$('tbody');
     $tbody.empty();
-    
+
     var actions = this.collection.findActions(this.account, this.current);
     var account = App.accounts.get(this.account);
     var allActions = this.collection.findActions(this.account);
     var defferenceTotal = 0;
-    
+
     App.sections.each(function(model) {
       var actionView = new App.SectionActionView({
         model: model,
         actions: actions,
         account: account
       });
-        
+
       $tbody.append(actionView.$el);
       defferenceTotal += actionView.defference;
     });
-    
+
     var totalClassName = defferenceTotal > 0? "incomeAmount": "expendAmount";
     $tbody.append('<tr><td>予算との差の合計</td><td></td><td></td><td class="' + totalClassName + '"><strong>' +
       App.formatAmount(defferenceTotal) + '</strong></td></tr>');
@@ -184,7 +184,7 @@ App.ActionView = Backbone.View.extend({
     '<td class="way"><%= way %></td>' +
     '<td class="debitDay"><%= model.formatDebitDay("YYYY/MM/DD") %></td>' +
     '<td class="shop"><%= model.get("shop") %></td>',
-    
+
   initialize: function() {
     this.render();
   },
@@ -192,7 +192,7 @@ App.ActionView = Backbone.View.extend({
     'click': 'onClick'
   },
   render: function() {
-    var html = _.template(this.template, { 
+    var html = _.template(this.template, {
       model: this.model,
       day: this.model.formatDate("ddd"),
       section: App.sections.get(this.model.get('section')).get('name'),
@@ -200,7 +200,7 @@ App.ActionView = Backbone.View.extend({
       way: App.ways.get(this.model.get('way')).get('name'),
       isIncome: this.model.get('isIncome')
     });
-    
+
     this.$el.html(html);
   },
   onClick: function(){
@@ -225,11 +225,11 @@ App.SectionActionView = Backbone.View.extend({
     var subsectionList = {};
     var subsections = App.subsections.select(function(model) {
       return model.get('parent') === section.id;
-    })
+    });
     _.each(subsections, function(model) {
       subsectionList[model.id] = 0;
     });
-    
+
     var sum = 0;
     _.each(this.actions, function(model){
       if(model.get('section') === section.id) {
@@ -240,13 +240,13 @@ App.SectionActionView = Backbone.View.extend({
     console.log(this.account);
     var budgetAmount = this.account.get('budgetAmounts')[section.id];
     this.defference = section.get('isIncome')? sum-budgetAmount: budgetAmount-sum;
-    
+
     var actionView = $(
       '<td class="' + sectionClassName + '">' + section.get('name') + '</td>' +
       '<td><strong>' + App.formatAmount(sum) + '</strong></td>' +
       '<td>' + App.formatAmount(budgetAmount) + '</td>' +
       '<td>' + App.formatAmount(this.defference) + '</td>');
-    
+
     var subsectionListView = $('<ul hidden>');
     _.each(subsections, function(model){
       var li =
@@ -259,8 +259,8 @@ App.SectionActionView = Backbone.View.extend({
   },
   onClick: function(e){
     e.stopPropagation();
-    console.log('m')
-    this.subsectionListView.toggle()
+    console.log('m');
+    this.subsectionListView.toggle();
   }
 });
 
@@ -332,7 +332,7 @@ App.AccountControlView = Backbone.View.extend({
     var buttonTags = '';
     this.collection.each(function(model) {
       buttonTags += '<button class="" value="' + model.id + '">' + model.get('name') +'</button>';
-    })
+    });
     buttonTags += '<button class="" value="all">すべて</button>';
     this.$el.html(buttonTags);
   },
@@ -372,12 +372,12 @@ App.FormDialogView = Backbone.View.extend({
     //this.collection.model.prototype.defaults.section = this.$('select[name="section"]').find('option')[0].value;
     //this.collection.model.prototype.defaults.subsection = this.$('select[name="subsection"]').find('option')[0].value;
     //this.collection.model.prototype.defaults.way = this.$('select[name="way"]').find('option')[0].value;
-    
+
     //this.$('select[name="section"]').find('option').eq(0).prop('selected', true);
     //this.$('select[name="subsection"]').find('option').eq(0).prop('selected', true);
     //this.$('select[name="account"]').find('option').eq(0).prop('selected', true);
     //this.$('select[name="way"]').find('option').eq(0).prop('selected', true);
-    
+
     this.$('.title').text(this.model.get('isIncome')? '収入の入力': '支出の入力')
     this.$('input[name="amount"]').val(this.model.get('amount'));
     this.$('input[name="date"]').val(this.model.formatDate('YYYY-MM-DD'));
@@ -385,13 +385,13 @@ App.FormDialogView = Backbone.View.extend({
     this.$('input[name="isIncome"]').val(this.model.get('isIncome'));
     this.$('input[name="debitDay"]').val(this.model.formatDebitDay('YYYY-MM-DD'));
     this.$('input[name="shop"]').val(this.model.get('shop'));
-    
+
     this.$('select[name="section"]').val(this.model.get('section'));
     this.subsectionSelectTagView.changeParent(this.model.get('section'));
     this.$('select[name="subsection"]').val(this.model.get('subsection'));
     this.$('select[name="account"]').val(this.model.get('account'));
     this.$('select[name="way"]').val(this.model.get('way'));
-      
+
     if (this.model.isNew()) {
       this.$('.dialog-removeBtn').hide();
       this.$('.dialog-copyBtn').hide();
@@ -411,7 +411,7 @@ App.FormDialogView = Backbone.View.extend({
   },
   onSubmit: function(e) {
     e.preventDefault();
-    
+
     var amount = this.$('input[name="amount"]').val();
     var date = this.$('input[name="date"]').val();
     var section = this.$('select[name="section"]').val();
@@ -422,8 +422,8 @@ App.FormDialogView = Backbone.View.extend({
     var isIncome = this.$('input[name="isIncome"]').val();
     var debitDay = this.$('input[name="debitDay"]').val();
     var shop = this.$('input[name="shop"]').val();
-    
-    
+
+
     var params = {
       'amount': amount,
       'date': moment(date),
@@ -435,15 +435,15 @@ App.FormDialogView = Backbone.View.extend({
       'isIncome': Number(isIncome),
       'debitDay': debitDay? moment(debitDay): null,
       'shop': shop
-    }
-    
+    };
+
     if (this.model.isNew()) {
       this.collection.create(params, { validate: true });
     } else {
       this.model.save(params, { validate: true });
       this.close();
     }
-    
+
     App.mediator.trigger('shop:createShopName', shop);
   },
   onRemove: function(e) {
@@ -455,7 +455,7 @@ App.FormDialogView = Backbone.View.extend({
   },
   onCopy: function(e) {
     e.preventDefault();
-    
+
     var amount = this.$('input[name="amount"]').val();
     var date = this.$('input[name="date"]').val();
     var section = this.$('select[name="section"]').val();
@@ -466,7 +466,7 @@ App.FormDialogView = Backbone.View.extend({
     var isIncome = this.$('input[name="isIncome"]').val();
     var debitDay = this.$('input[name="debitDay"]').val();
     var shop = this.$('input[name="shop"]').val();
-    
+
     var params = {
       'amount': amount,
       'date': moment(date),
@@ -478,8 +478,8 @@ App.FormDialogView = Backbone.View.extend({
       'isIncome': Number(isIncome),
       'debitDay': debitDay? moment(debitDay): null,
       'shop': shop
-    }
-    
+    };
+
     this.model = new this.collection.model(params);
     this.render();
   },
@@ -498,7 +498,7 @@ App.FormDialogView = Backbone.View.extend({
     var way = this.$('select[name="way"]').val();
     var debitDayNum = App.ways.get(way).get('debitDayNum');
     var debitDay = moment(this.$('input[name="date"]').val()).date(debitDayNum).add(1, 'month');
-    
+
     this.$('input[name="debitDay"]').val(debitDay.format('YYYY-MM-DD'));
   }
 });
@@ -548,21 +548,21 @@ App.SectionDialogView = Backbone.View.extend({
   getParams: function() {
     var name = this.$('input[name="name"]').val();
     var isIncome = this.$('select[name="isIncome"]').val();
-    
+
     return {
       'name': name,
       'isIncome': Number(isIncome)
-    }
+    };
   },
   saveSubsections: function() {
     var subsections = this.collection.child;
     var section = this.model;
     var $subsections = this.$('select[name="subsection"] :selected');
-    
+
     $subsections.each(function(){
       var thisId = $(this).val();
       subsections.get(thisId).save({'parent': section.id});
-    })
+    });
   },
   onSubmit: function(e) {
     e.preventDefault();
@@ -639,11 +639,11 @@ App.SubsectionDialogView = Backbone.View.extend({
   getParams: function() {
     var name = this.$('input[name="name"]').val();
     var section = this.$('select[name="section"]').val();
-    
+
     return {
       'name': name,
       'parent': section
-    }
+    };
   },
   onSubmit: function(e) {
     e.preventDefault();
@@ -694,12 +694,12 @@ App.AccountDialogView = Backbone.View.extend({
     var html = '';
     var template = this.budgetTemplate;
     App.sections.each(function(model) {
-      html += _.template(template, { 
+      html += _.template(template, {
         section: model
       });
-    })
+    });
     $budgetAmounts.html(html);
-    
+
     if(this.model) {
       var budgetAmounts = this.model.get('budgetAmounts');
       this.$('input[name="name"]').val(this.model.get('name'));
@@ -710,7 +710,7 @@ App.AccountDialogView = Backbone.View.extend({
       }
     }else{
       this.$('input[name="name"]').val('');
-      $budgetAmounts.find('input').val(0)
+      $budgetAmounts.find('input').val(0);
     }
   },
   open: function() {
@@ -731,11 +731,11 @@ App.AccountDialogView = Backbone.View.extend({
     this.$('.budgetAmounts').find('input').each(function() {
       budgetAmounts[this.name] = Number(this.value);
     });
-    
+
     return {
       'name': name,
       'budgetAmounts': budgetAmounts
-    }
+    };
   },
   onSubmit: function(e) {
     e.preventDefault();
@@ -802,11 +802,11 @@ App.WayDialogView = Backbone.View.extend({
   getParams: function() {
     var name = this.$('input[name="name"]').val();
     var debitDayNum = this.$('input[name="debitDayNum"]').val();
-    
+
     return {
       'name': name,
       'debitDayNum': debitDayNum
-    }
+    };
   },
   onSubmit: function(e) {
     e.preventDefault();
@@ -841,25 +841,25 @@ App.FormSelectTagView = Backbone.View.extend({
     this.listenTo(this.collection, 'create change remove', this.render);
   },
   render: function() {
-    var value = this.$el.val()
+    var value = this.$el.val();
     var optionTags = '';
     var collection = this.collection.chain();
     if(this.parent) {
       var parent = this.parent;
-      collection = collection.select(function(model){ 
+      collection = collection.select(function(model){
         return model.get('parent') === parent;
-      })
+      });
     }
     collection.each(function(model) {
       optionTags += '<option value="' + model.id + '">' + model.get('name') +'</option>';
     }).value();
     this.$el.html(optionTags);
     this.$el.val(value);
-    
+
   },
   changeParent: function(parent) {
     this.parent = parent;
-    this.render()
+    this.render();
   }
 });
 
@@ -881,7 +881,7 @@ App.ShopInputView = Backbone.View.extend({
   inputName: function(name) {
     this.$el.val(name);
   }
-  
+
 });
 
 App.ShopButtonView = Backbone.View.extend({
@@ -896,11 +896,11 @@ App.ShopButtonView = Backbone.View.extend({
     var buttonTags = '';
     this.collection.each(function(model) {
       buttonTags += '<button value="' + model.get('name') + '">' + model.get('name') + '</button>';
-    })
+    });
     this.$el.html(buttonTags);
     this.$('button').on('mousedown', function(e) {
       App.mediator.trigger('shop:inputName', e.target.value);
-    })
+    });
   },
   createShopName: function(name) {
     this.collection.createOnlyNames([name]);
