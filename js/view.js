@@ -40,11 +40,13 @@ App.CalendarView = Backbone.View.extend({
     this.listenTo(App.mediator, 'calendar:prev', this.toPrev);
     this.listenTo(App.mediator, 'calendar:next', this.toNext);
     this.listenTo(App.mediator, 'calendar:today', this.toToday);
+    this.listenTo(App.mediator, 'calendar:average', this.average);
     this.listenTo(App.mediator, 'calendar:changeAccount', this.onChangeAccount);
     this.listenTo(App.mediator, 'calendar:moveTo', this.moveTo);
   },
-  render: function() {
+  render: function(model) {
     if(!this.current) return true;
+    var changedModel = model || 0;
 
     var $caption = this.$('caption');
     var $tbody = this.$('tbody');
@@ -56,6 +58,8 @@ App.CalendarView = Backbone.View.extend({
 
     var actions = this.collection.findActions(this.account, this.current);
     var allActions = this.collection.findActions(this.account);
+    var totalIncome = 0;
+    var totalExpend = 0;
     var total = 0;
     var allTotal = 0;
     var sign = '';
@@ -65,11 +69,27 @@ App.CalendarView = Backbone.View.extend({
         model: model
       });
       actionView.$el.appendTo($tbody);
+      if ( model === changedModel ) {
+        actionView.$el.addClass('addorchanged');
+      }
 
-      total += Number(model.get('isIncome')? model.get('amount'): 0-model.get('amount'));
+      var amount = Number(model.get('amount'));
+
+      if(model.get('isIncome')) {
+        totalIncome += amount;
+      } else {
+        totalExpend += amount;
+      }
+
     });
+
+    total = totalIncome - totalExpend;
     sign = total < 0 ? 'expendAmount' : 'incomeAmount';
     $tbody.append('<tr><td>月合計</td><td class="' + sign + '">' + App.formatAmount(total) + '</td></tr>');
+
+    $tbody.append('<tr><td>月収入</td><td class="incomeAmount">' + App.formatAmount(totalIncome) + '</td></tr>');
+
+    $tbody.append('<tr><td>月支出</td><td class="expendAmount">' + App.formatAmount(totalExpend) + '</td></tr>');
 
     _.each(allActions, function(model) {
       allTotal += Number(model.get('isIncome')? model.get('amount'): 0-model.get('amount'));
@@ -84,6 +104,67 @@ App.CalendarView = Backbone.View.extend({
 //        currentDay.add(1, 'day');
 //      }
 //    }
+  },
+  average: function(firstYear, firstMonth, finishYear, finishMonth) {
+    if(!(firstYear&&firstMonth&&finishYear&&finishMonth)) return true;
+
+    var $caption = this.$('caption');
+    var $tbody = this.$('tbody');
+
+    var firstDate = moment({y: firstYear, M: firstMonth-1});
+    var finishDate = moment({y: finishYear, M: finishMonth-1});
+
+    $tbody.empty();
+    $caption.text( firstDate.format('YYYY年MM月') + ' - ' + finishDate.format('YYYY年MM月') );
+
+    var actions = [];
+    var allActions = [];
+    for(var currentDate = firstDate,number = 0; currentDate <= finishDate; currentDate.add(1, 'month') ) {
+      console.log(moment(currentDate).format('YYYY-MM'));
+      //actions.push(this.collection.findActions(this.account, currentDate));
+      allActions = allActions.concat(this.collection.findActions(this.account, currentDate));
+      number++;
+    }
+    console.log(number);
+    actions = allActions;
+    var totalIncome = 0;
+    var totalExpend = 0;
+    var total = 0;
+    var aveIncome = 0;
+    var aveExpend = 0;
+    var aveTotal = 0;
+    var allTotal = 0;
+    var sign = '';
+
+    _.each(actions, function(model) {
+
+      var amount = Number(model.get('amount'));
+
+      if(model.get('isIncome')) {
+        totalIncome += amount;
+      } else {
+        totalExpend += amount;
+      }
+
+    });
+    total = totalIncome - totalExpend;
+
+    aveIncome = parseInt(totalIncome/number);
+    aveExpend = parseInt(totalExpend/number);
+    aveTotal = parseInt(total/number);
+
+    sign = total < 0 ? 'expendAmount' : 'incomeAmount';
+    $tbody.append('<tr><td>月平均残額</td><td class="' + sign + '">' + App.formatAmount(aveTotal) + '</td></tr>');
+
+    $tbody.append('<tr><td>月平均収入</td><td class="incomeAmount">' + App.formatAmount(aveIncome) + '</td></tr>');
+
+    $tbody.append('<tr><td>月平均支出</td><td class="expendAmount">' + App.formatAmount(aveExpend) + '</td></tr>');
+
+    _.each(allActions, function(model) {
+      allTotal += Number(model.get('isIncome')? model.get('amount'): 0-model.get('amount'));
+    });
+    sign = allTotal < 0 ? 'expendAmount' : 'incomeAmount';
+    $tbody.append('<tr><td>全合計</td><td class="' + sign + '">' + App.formatAmount(allTotal) + '</td></tr>');
   },
   toPrev: function() {
     this.current.subtract(1, 'month');
@@ -113,12 +194,15 @@ App.CalendarView = Backbone.View.extend({
   }
 });
 
+// --------------------------------------------------------------------------
+
 App.SectionListView = Backbone.View.extend({
   initialize: function() {
     this.listenTo(this.collection, 'add change remove', this.render);
     this.listenTo(App.mediator, 'calendar:prev', this.toPrev);
     this.listenTo(App.mediator, 'calendar:next', this.toNext);
     this.listenTo(App.mediator, 'calendar:today', this.toToday);
+    this.listenTo(App.mediator, 'calendar:average', this.average);
     this.listenTo(App.mediator, 'calendar:changeAccount', this.onChangeAccount);
     this.listenTo(App.mediator, 'calendar:moveTo', this.moveTo);
   },
@@ -148,23 +232,87 @@ App.SectionListView = Backbone.View.extend({
     $tbody.append('<tr><td>予算との差の合計</td><td></td><td></td><td class="' + totalClassName + '"><strong>' +
       App.formatAmount(defferenceTotal) + '</strong></td></tr>');
   },
+  average: function(firstYear, firstMonth, finishYear, finishMonth) {
+    if(!(firstYear&&firstMonth&&finishYear&&finishMonth)) return true;
+
+    var $tbody = this.$('tbody');
+
+    var firstDate = moment({y: firstYear, M: firstMonth-1});
+    var finishDate = moment({y: finishYear, M: finishMonth-1});
+
+    $tbody.empty();
+
+    var actions = [];
+    var allActions = [];
+    var account = App.accounts.get(this.account);
+    for(var currentDate = firstDate,number = 0; currentDate <= finishDate; currentDate.add(1, 'month') ) {
+      console.log(moment(currentDate).format('YYYY-MM'));
+      //actions.push(this.collection.findActions(this.account, currentDate));
+      allActions = allActions.concat(this.collection.findActions(this.account, currentDate));
+      number++;
+    }
+    // console.log(number);
+    // actions = allActions;
+    // var totalIncome = 0;
+    // var totalExpend = 0;
+    // var total = 0;
+    // var aveIncome = 0;
+    // var aveExpend = 0;
+    // var aveTotal = 0;
+    // var allTotal = 0;
+    // var sign = '';
+
+    // _.each(actions, function(model) {
+
+    //   var amount = Number(model.get('amount'));
+
+    //   if(model.get('isIncome')) {
+    //     totalIncome += amount;
+    //   } else {
+    //     totalExpend += amount;
+    //   }
+
+    // });
+    // total = totalIncome - totalExpend;
+
+    // aveIncome = parseInt(totalIncome/number);
+    // aveExpend = parseInt(totalExpend/number);
+    // aveTotal = parseInt(total/number);
+
+    // sign = total < 0 ? 'expendAmount' : 'incomeAmount';
+    // $tbody.append('<tr><td>月平均残額</td><td class="' + sign + '">' + App.formatAmount(aveTotal) + '</td></tr>');
+
+    // $tbody.append('<tr><td>月平均収入</td><td class="incomeAmount">' + App.formatAmount(aveIncome) + '</td></tr>');
+
+    // $tbody.append('<tr><td>月平均支出</td><td class="expendAmount">' + App.formatAmount(aveExpend) + '</td></tr>');
+
+    // _.each(allActions, function(model) {
+    //   allTotal += Number(model.get('isIncome')? model.get('amount'): 0-model.get('amount'));
+    // });
+    // sign = allTotal < 0 ? 'expendAmount' : 'incomeAmount';
+    // $tbody.append('<tr><td>全合計</td><td class="' + sign + '">' + App.formatAmount(allTotal) + '</td></tr>');
+  },
   toPrev: function() {
     this.current.subtract(1, 'month');
+    this.collection.model.prototype.defaults.date = this.current;
     this.render();
     App.router.navigate(this.current.format('YYYY/MM'));
   },
   toNext: function() {
     this.current.add(1, 'month');
+    this.collection.model.prototype.defaults.date = this.current;
     this.render();
     App.router.navigate(this.current.format('YYYY/MM'));
   },
   toToday: function() {
     this.current = moment();
+    this.collection.model.prototype.defaults.date = this.current;
     this.render();
     App.router.navigate('');
   },
   moveTo: function(year, month) {
     this.current = moment({ year: year, month: month - 1 });
+    this.collection.model.prototype.defaults.date = this.current;
     this.render();
   },
   onChangeAccount: function(account) {
@@ -237,7 +385,7 @@ App.SectionActionView = Backbone.View.extend({
         subsectionList[model.get('subsection')] += Number(model.get('amount'));
       }
     });
-    console.log(this.account);
+    //console.log(this.account);
     var budgetAmount = this.account.get('budgetAmounts')[section.id];
     this.defference = section.get('isIncome')? sum-budgetAmount: budgetAmount-sum;
 
@@ -264,6 +412,8 @@ App.SectionActionView = Backbone.View.extend({
   }
 });
 
+// ----------------------------------------------------------------------------------------
+
 App.CalendarControlView = Backbone.View.extend({
   events: {
     'click .calendar-incomeBtn': 'onClickIncome',
@@ -271,6 +421,7 @@ App.CalendarControlView = Backbone.View.extend({
     'click .calendar-prevBtn': 'onClickPrev',
     'click .calendar-nextBtn': 'onClickNext',
     'click .calendar-todayBtn': 'onClickToday',
+    'click .calendar-averageBtn': 'onClickAverage',
     'click .calendar-sectionBtn': 'onClickSection',
     'click .calendar-subsectionBtn': 'onClickSubsection',
     'click .calendar-accountBtn': 'onClickAccount',
@@ -296,6 +447,14 @@ App.CalendarControlView = Backbone.View.extend({
   },
   onClickToday: function() {
     App.mediator.trigger('calendar:today');
+  },
+  onClickAverage: function() {
+    App.mediator.trigger('calendar:average',
+      this.$el.find('.calendar-average-first-year').val(),
+      this.$el.find('.calendar-average-first-month').val(),
+      this.$el.find('.calendar-average-finish-year').val(),
+      this.$el.find('.calendar-average-finish-month').val()
+    );
   },
   onKeyup: function(e) {
     if(e.keyCode == 112){
@@ -348,6 +507,8 @@ App.AccountControlView = Backbone.View.extend({
     App.mediator.trigger('calendar:changeAccount', this.account);
   }
 });
+
+// ----------------------------------------------------------------------------------------
 
 App.FormDialogView = Backbone.View.extend({
   events: {
@@ -503,6 +664,8 @@ App.FormDialogView = Backbone.View.extend({
   }
 });
 
+// ----------------------------------------------------------------------------------------
+
 App.SectionDialogView = Backbone.View.extend({
   events: {
     'submit form': 'onSubmit',
@@ -592,6 +755,8 @@ App.SectionDialogView = Backbone.View.extend({
     alert(message);
   }
 });
+
+// ----------------------------------------------------------------------------------------
 
 App.SubsectionDialogView = Backbone.View.extend({
   events: {

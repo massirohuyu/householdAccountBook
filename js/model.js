@@ -66,7 +66,7 @@ App.Actions = Backbone.Collection.extend({
     if(date) {
       var format = 'YYYY-MM';
       var targetDate = moment(date).format(format);
-      
+
       actions = actions.select(function(model) {
          return model.formatDate(format) === targetDate;
       });

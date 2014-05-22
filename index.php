@@ -1,6 +1,6 @@
 <?php
 session_start();
- 
+
 // ログイン状態のチェック
 if (!isset($_SESSION["USERIDREC"])) {
   header("Location: login.html");
@@ -34,8 +34,14 @@ if (!isset($_SESSION["USERIDREC"])) {
     <button class="calendar-prevBtn">Prev</button>
     <button class="calendar-nextBtn">Next</button>
     <button class="calendar-todayBtn">Today</button>
+    <button class="calendar-averageBtn">月平均</button>
+    <input type="number" value="2014" class="calendar-average-first-year">
+    <input type="number" value="1" class="calendar-average-first-month">
+    -
+    <input type="number" value="2014" class="calendar-average-finish-year">
+    <input type="number" value="1" class="calendar-average-finish-month">
   </div>
-  
+
   <table class="calendar" id="actionsList">
     <caption></caption>
     <thead>
@@ -53,7 +59,7 @@ if (!isset($_SESSION["USERIDREC"])) {
     <tbody>
     </tbody>
   </table>
-  
+
   <table class="calendar" id="sectionsList">
     <caption>費目ごとの収支</caption>
     <thead>
@@ -67,7 +73,7 @@ if (!isset($_SESSION["USERIDREC"])) {
     <tbody>
     </tbody>
   </table>
-  
+
   <div class="calendar-control">
     <button class="calendar-sectionBtn">費目編集</button>
     <button class="calendar-subsectionBtn">内訳編集</button>
@@ -84,38 +90,38 @@ if (!isset($_SESSION["USERIDREC"])) {
       <form>
         <h3>日付</h3>
         <p><input type="date" name="date"></p>
-        
+
         <h3>費目</h3>
         <p><select name="section">
         </select></p>
-        
+
         <h3>内訳</h3>
         <p><select name="subsection">
         </select></p>
-        
+
         <h3>詳細</h3>
         <p><input type="text" name="detail"></p>
-        
+
         <h3>金額</h3>
         <p><input type="number" name="amount"></p>
-        
+
         <h3>お店</h3>
         <div class="shopContainer">
           <p><input type="text" name="shop" class="shopInput"></p>
           <div class="shopList" hidden></div>
         </div>
-        
+
         <h3>家計簿</h3>
         <p><select name="account">
         </select></p>
-        
+
         <h3>取扱</h3>
         <p><select name="way">
         </select></p>
-        
+
         <h3>引き落とし日</h3>
         <p><input type="date" name="debitDay"></p>
-        
+
         <input type="hidden" name="isIncome" value="0">
         <div class="dialog-controll">
           <input type="submit" value="Save">
@@ -226,7 +232,7 @@ if (!isset($_SESSION["USERIDREC"])) {
     <input type="date" name="filterDate">
     <input type="submit">
   </form>
-  
+
   <p class="count"></p>
   <ul class="list"></ul> -->
   </body>

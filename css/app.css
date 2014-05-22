@@ -70,6 +70,16 @@
   background: #47a447;
 }
 
+.calendar-control input[class="calendar-average-first-year"],
+.calendar-control input[class="calendar-average-finish-year"] {
+  width: 4em;
+}
+
+.calendar-control input[class="calendar-average-first-month"],
+.calendar-control input[class="calendar-average-finish-month"] {
+  width: 3em;
+}
+
 .calendar {
   table-layout: fixed;
   border-collapse: collapse;
@@ -118,6 +128,22 @@
 .calendar tr:hover {
   color: #6b87ff;
   text-decoration: underline;
+}
+
+.calendar tr.addorchanged td {
+  animation: addorchanged 2s ;
+  -webkit-animation: addorchanged 2s ;
+  font-weight: bold;
+}
+
+@keyframes addorchanged {
+  0% {background-color: #fa8072;}
+  100% {background-color: #fff;}
+}
+
+@-webkit-keyframes addorchanged {
+  0% {background-color: #fa8072;}
+  100% {background-color: #fff;}
 }
 
 .calendar .calendar-date {
