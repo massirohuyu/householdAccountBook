@@ -137,12 +137,12 @@
 }
 
 @keyframes addorchanged {
-  0% {background-color: #fa8072;}
+  0% {background-color: #5cb85c;}
   100% {background-color: #fff;}
 }
 
 @-webkit-keyframes addorchanged {
-  0% {background-color: #fa8072;}
+  0% {background-color: #5cb85c;}
   100% {background-color: #fff;}
 }
 
@@ -289,4 +289,90 @@
 
 .dialog .shopList button:hover {
   background: #fa8072;
+}
+
+#input-dialog {
+  display: none;
+}
+
+@media screen and (max-width:768px){ /*タブレット、スマホ用*/
+  body,
+  .calendar-control,
+  .calendar td {
+    font-size: 20px;
+  }
+
+  .dialog,
+  .dialog input[type="text"],
+  .dialog input,
+  .dialog select {
+    font-size: 20px;
+  }
+
+  #input-dialog {
+    /*display: block;*/
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  #input-dialog .dialog-body {
+    position: absolute;
+    margin: 0;
+    width: auto;
+    height: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+#calculator {
+  overflow: hidden;
+  width: 15em;
+}
+
+#calculator button{
+  font-size: 15px;
+  float: left;
+  margin: 0;
+  text-align: center;
+  width: 3em;
+  line-height: 2em;
+  border-radius: 0.3em;
+  background-color: #eee;
+  border: 1px solid;
+  border-color: #ccc #aaa #888 #aaa;
+  outline-color: #9bdb9c;
+}
+
+#calculator .nums{
+  float: left;
+  width: 10em;
+}
+
+#calculator .nums button{
+  margin: 0.5em 0 0 0.5em;
+}
+
+#calculator .ops{
+  float: left;
+  width: 3em;
+}
+
+#calculator .ops button{
+  margin: 0.5em 0 0 0.3em;
+}
+
+#calculator .op.selected {
+  background-color: #ccffcc;
+  border-color: #f5ffe5 #b9e5b9 #9bdb9c #b9e5b9;
+  color: #267c26;
+}
+
+#calculator .clear,
+#calculator .result {
+  width: 6.5em;
+  margin: 0.5em 0 0 0.5em;
 }

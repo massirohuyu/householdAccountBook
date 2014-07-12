@@ -1,520 +1,484 @@
-//App.CreateFormView = Backbone.View.extend({
-//  events: {
-//    'submit': 'onSubmit'
-//  },
-//  initialize: function() {
-//    this.listenTo(this.collection, 'invalid', this.onError);
-//  },
-//  onSubmit: function(e) {
-//    e.preventDefault();
-//
-//    var amount = this.$('input[name="amount"]').val();
-//    var date = this.$('input[name="date"]').val();
-//    var section = this.$('select[name="section"]').val();
-//    var subsection = this.$('select[name="subsection"]').val();
-//    var detail = this.$('input[name="detail"]').val();
-//    var account = this.$('select[name="account"]').val();
-//    var way = this.$('select[name="way"]').val();
-//    var isIncome = this.$('input[name="isIncome"]').val();
-//    var debitDay = this.$('select[name="debitDay"]').val();
-//    var shop = this.$('input[name="shop"]').val();
-//
-//    this.collection.add({
-//      'amount': amount,
-//      'date': moment(date),
-//      'section': section,
-//      'subsection': subsection,
-//      'detail': detail,
-//      'account': account,
-//      'way': way,
-//      'isIncome': Number(isIncome),
-//      'debitDay': debitDay? moment(debitDay): null,
-//      'shop': shop
-//    }, { validate: true });
-//  }
-//});
+// App.CalendarView = Backbone.View.extend({
+//   initialize: function() {
+//     this.listenTo(this.collection, 'add change remove', this.render);
+//     this.listenTo(App.mediator, 'calendar:prev', this.toPrev);
+//     this.listenTo(App.mediator, 'calendar:next', this.toNext);
+//     this.listenTo(App.mediator, 'calendar:today', this.toToday);
+//     this.listenTo(App.mediator, 'calendar:average', this.average);
+//     this.listenTo(App.mediator, 'calendar:changeAccount', this.onChangeAccount);
+//     this.listenTo(App.mediator, 'calendar:moveTo', this.moveTo);
+//   },
+//   render: function(model) {
+//     if(!this.current) return true;
+//     var changedModel = model || 0;
 
-App.CalendarView = Backbone.View.extend({
-  initialize: function() {
-    this.listenTo(this.collection, 'add change remove', this.render);
-    this.listenTo(App.mediator, 'calendar:prev', this.toPrev);
-    this.listenTo(App.mediator, 'calendar:next', this.toNext);
-    this.listenTo(App.mediator, 'calendar:today', this.toToday);
-    this.listenTo(App.mediator, 'calendar:average', this.average);
-    this.listenTo(App.mediator, 'calendar:changeAccount', this.onChangeAccount);
-    this.listenTo(App.mediator, 'calendar:moveTo', this.moveTo);
-  },
-  render: function(model) {
-    if(!this.current) return true;
-    var changedModel = model || 0;
+//     var $caption = this.$('caption');
+//     var $tbody = this.$('tbody');
+//     var currentDay = this.current.clone().startOf('month').startOf('week');
+//     var endDay = this.current.clone().endOf('month');
 
-    var $caption = this.$('caption');
-    var $tbody = this.$('tbody');
-    var currentDay = this.current.clone().startOf('month').startOf('week');
-    var endDay = this.current.clone().endOf('month');
+//     $tbody.empty();
+//     $caption.text( this.current.format('YYYY年MM月') );
 
-    $tbody.empty();
-    $caption.text( this.current.format('YYYY年MM月') );
+//     var actions = this.collection.findActions(this.account, this.current);
+//     var allActions = this.collection.findActions(this.account);
+//     var totalIncome = 0;
+//     var totalExpend = 0;
+//     var total = 0;
+//     var allTotal = 0;
+//     var sign = '';
 
-    var actions = this.collection.findActions(this.account, this.current);
-    var allActions = this.collection.findActions(this.account);
-    var totalIncome = 0;
-    var totalExpend = 0;
-    var total = 0;
-    var allTotal = 0;
-    var sign = '';
+//     _.each(actions, function(model) {
+//       var actionView = new App.ActionView({
+//         model: model
+//       });
+//       actionView.$el.appendTo($tbody);
+//       if ( model === changedModel ) {
+//         actionView.$el.addClass('addorchanged');
+//       }
 
-    _.each(actions, function(model) {
-      var actionView = new App.ActionView({
-        model: model
-      });
-      actionView.$el.appendTo($tbody);
-      if ( model === changedModel ) {
-        actionView.$el.addClass('addorchanged');
-      }
+//       var amount = Number(model.get('amount'));
 
-      var amount = Number(model.get('amount'));
+//       if(model.get('isIncome')) {
+//         totalIncome += amount;
+//       } else {
+//         totalExpend += amount;
+//       }
 
-      if(model.get('isIncome')) {
-        totalIncome += amount;
-      } else {
-        totalExpend += amount;
-      }
+//     });
 
-    });
+//     total = totalIncome - totalExpend;
+//     sign = total < 0 ? 'expendAmount' : 'incomeAmount';
 
-    total = totalIncome - totalExpend;
-    sign = total < 0 ? 'expendAmount' : 'incomeAmount';
+//     $tbody.append('<tr><td>月収入</td><td class="incomeAmount">' + App.formatAmount(totalIncome) + '</td></tr>');
 
-    $tbody.append('<tr><td>月収入</td><td class="incomeAmount">' + App.formatAmount(totalIncome) + '</td></tr>');
+//     $tbody.append('<tr><td>月支出</td><td class="expendAmount">' + App.formatAmount(totalExpend) + '</td></tr>');
 
-    $tbody.append('<tr><td>月支出</td><td class="expendAmount">' + App.formatAmount(totalExpend) + '</td></tr>');
+//     $tbody.append('<tr><td>月合計</td><td class="' + sign + '">' + App.formatAmount(total) + '</td></tr>');
 
-    $tbody.append('<tr><td>月合計</td><td class="' + sign + '">' + App.formatAmount(total) + '</td></tr>');
+//     _.each(allActions, function(model) {
+//       allTotal += Number(model.get('isIncome')? model.get('amount'): 0-model.get('amount'));
+//     });
+//     sign = allTotal < 0 ? 'expendAmount' : 'incomeAmount';
+//     $tbody.append('<tr><td>全合計</td><td class="' + sign + '">' + App.formatAmount(allTotal) + '</td></tr>');
 
-    _.each(allActions, function(model) {
-      allTotal += Number(model.get('isIncome')? model.get('amount'): 0-model.get('amount'));
-    });
-    sign = allTotal < 0 ? 'expendAmount' : 'incomeAmount';
-    $tbody.append('<tr><td>全合計</td><td class="' + sign + '">' + App.formatAmount(allTotal) + '</td></tr>');
+// //    while (currentDay <= endDay) {
+// //      var $tr = $('<tr>').appendTo($tbody);
+// //      for (var i = 0; i < 7; i++) {
+// //        var $td = $('<td>').text( currentDay.format('MM/DD') ).appendTo($tr);
+// //        currentDay.add(1, 'day');
+// //      }
+// //    }
+//   },
+//   average: function(firstYear, firstMonth, finishYear, finishMonth) {
+//     if(!(firstYear&&firstMonth&&finishYear&&finishMonth)) return true;
 
-//    while (currentDay <= endDay) {
-//      var $tr = $('<tr>').appendTo($tbody);
-//      for (var i = 0; i < 7; i++) {
-//        var $td = $('<td>').text( currentDay.format('MM/DD') ).appendTo($tr);
-//        currentDay.add(1, 'day');
-//      }
-//    }
-  },
-  average: function(firstYear, firstMonth, finishYear, finishMonth) {
-    if(!(firstYear&&firstMonth&&finishYear&&finishMonth)) return true;
+//     var $caption = this.$('caption');
+//     var $tbody = this.$('tbody');
 
-    var $caption = this.$('caption');
-    var $tbody = this.$('tbody');
+//     var firstDate = moment({y: firstYear, M: firstMonth-1});
+//     var finishDate = moment({y: finishYear, M: finishMonth-1});
 
-    var firstDate = moment({y: firstYear, M: firstMonth-1});
-    var finishDate = moment({y: finishYear, M: finishMonth-1});
+//     $tbody.empty();
+//     $caption.text( firstDate.format('YYYY年MM月') + ' - ' + finishDate.format('YYYY年MM月') );
 
-    $tbody.empty();
-    $caption.text( firstDate.format('YYYY年MM月') + ' - ' + finishDate.format('YYYY年MM月') );
+//     var actions = [];
+//     var allActions = [];
+//     for(var currentDate = firstDate,number = 0; currentDate <= finishDate; currentDate.add(1, 'month') ) {
+//       console.log(moment(currentDate).format('YYYY-MM'));
+//       //actions.push(this.collection.findActions(this.account, currentDate));
+//       allActions = allActions.concat(this.collection.findActions(this.account, currentDate));
+//       number++;
+//     }
+//     console.log(number);
+//     actions = allActions;
+//     var totalIncome = 0;
+//     var totalExpend = 0;
+//     var total = 0;
+//     var aveIncome = 0;
+//     var aveExpend = 0;
+//     var aveTotal = 0;
+//     var allTotal = 0;
+//     var sign = '';
 
-    var actions = [];
-    var allActions = [];
-    for(var currentDate = firstDate,number = 0; currentDate <= finishDate; currentDate.add(1, 'month') ) {
-      console.log(moment(currentDate).format('YYYY-MM'));
-      //actions.push(this.collection.findActions(this.account, currentDate));
-      allActions = allActions.concat(this.collection.findActions(this.account, currentDate));
-      number++;
-    }
-    console.log(number);
-    actions = allActions;
-    var totalIncome = 0;
-    var totalExpend = 0;
-    var total = 0;
-    var aveIncome = 0;
-    var aveExpend = 0;
-    var aveTotal = 0;
-    var allTotal = 0;
-    var sign = '';
+//     _.each(actions, function(model) {
 
-    _.each(actions, function(model) {
+//       var amount = Number(model.get('amount'));
 
-      var amount = Number(model.get('amount'));
+//       if(model.get('isIncome')) {
+//         totalIncome += amount;
+//       } else {
+//         totalExpend += amount;
+//       }
 
-      if(model.get('isIncome')) {
-        totalIncome += amount;
-      } else {
-        totalExpend += amount;
-      }
+//     });
+//     total = totalIncome - totalExpend;
 
-    });
-    total = totalIncome - totalExpend;
+//     aveIncome = parseInt(totalIncome/number);
+//     aveExpend = parseInt(totalExpend/number);
+//     aveTotal = parseInt(total/number);
 
-    aveIncome = parseInt(totalIncome/number);
-    aveExpend = parseInt(totalExpend/number);
-    aveTotal = parseInt(total/number);
+//     sign = total < 0 ? 'expendAmount' : 'incomeAmount';
+//     $tbody.append('<tr><td>月平均残額</td><td class="' + sign + '">' + App.formatAmount(aveTotal) + '</td></tr>');
 
-    sign = total < 0 ? 'expendAmount' : 'incomeAmount';
-    $tbody.append('<tr><td>月平均残額</td><td class="' + sign + '">' + App.formatAmount(aveTotal) + '</td></tr>');
+//     $tbody.append('<tr><td>月平均収入</td><td class="incomeAmount">' + App.formatAmount(aveIncome) + '</td></tr>');
 
-    $tbody.append('<tr><td>月平均収入</td><td class="incomeAmount">' + App.formatAmount(aveIncome) + '</td></tr>');
+//     $tbody.append('<tr><td>月平均支出</td><td class="expendAmount">' + App.formatAmount(aveExpend) + '</td></tr>');
 
-    $tbody.append('<tr><td>月平均支出</td><td class="expendAmount">' + App.formatAmount(aveExpend) + '</td></tr>');
-
-    _.each(allActions, function(model) {
-      allTotal += Number(model.get('isIncome')? model.get('amount'): 0-model.get('amount'));
-    });
-    sign = allTotal < 0 ? 'expendAmount' : 'incomeAmount';
-    $tbody.append('<tr><td>全合計</td><td class="' + sign + '">' + App.formatAmount(allTotal) + '</td></tr>');
-  },
-  toPrev: function() {
-    this.current.subtract(1, 'month');
-    this.render();
-    App.router.navigate(this.current.format('YYYY/MM'));
-  },
-  toNext: function() {
-    this.current.add(1, 'month');
-    this.render();
-    App.router.navigate(this.current.format('YYYY/MM'));
-  },
-  toToday: function() {
-    this.current = moment();
-    console.log(this.current);
-    this.render();
-    App.router.navigate('');
-  },
-  moveTo: function(year, month) {
-    console.log(year + ':' + month);
-    this.current = moment({ year: year, month: month - 1 });
-    this.render();
-  },
-  onChangeAccount: function(account) {
-    this.account = account;
-    this.collection.model.prototype.defaults.account = account;
-    this.render();
-  }
-});
+//     _.each(allActions, function(model) {
+//       allTotal += Number(model.get('isIncome')? model.get('amount'): 0-model.get('amount'));
+//     });
+//     sign = allTotal < 0 ? 'expendAmount' : 'incomeAmount';
+//     $tbody.append('<tr><td>全合計</td><td class="' + sign + '">' + App.formatAmount(allTotal) + '</td></tr>');
+//   },
+//   toPrev: function() {
+//     this.current.subtract(1, 'month');
+//     this.render();
+//     App.router.navigate(this.current.format('YYYY/MM'));
+//   },
+//   toNext: function() {
+//     this.current.add(1, 'month');
+//     this.render();
+//     App.router.navigate(this.current.format('YYYY/MM'));
+//   },
+//   toToday: function() {
+//     this.current = moment();
+//     console.log(this.current);
+//     this.render();
+//     App.router.navigate('');
+//   },
+//   moveTo: function(year, month) {
+//     console.log(year + ':' + month);
+//     this.current = moment({ year: year, month: month - 1 });
+//     this.render();
+//   },
+//   onChangeAccount: function(account) {
+//     this.account = account;
+//     this.collection.model.prototype.defaults.account = account;
+//     this.render();
+//   }
+// });
 
 // --------------------------------------------------------------------------
 
-App.SectionListView = Backbone.View.extend({
-  initialize: function() {
-    this.listenTo(this.collection, 'add change remove', this.render);
-    this.listenTo(App.mediator, 'calendar:prev', this.toPrev);
-    this.listenTo(App.mediator, 'calendar:next', this.toNext);
-    this.listenTo(App.mediator, 'calendar:today', this.toToday);
-    this.listenTo(App.mediator, 'calendar:average', this.average);
-    this.listenTo(App.mediator, 'calendar:changeAccount', this.onChangeAccount);
-    this.listenTo(App.mediator, 'calendar:moveTo', this.moveTo);
-  },
-  render: function() {
-    if(!this.current) return true;
+// App.SectionListView = Backbone.View.extend({
+//   initialize: function() {
+//     this.listenTo(this.collection, 'add change remove', this.render);
+//     this.listenTo(App.mediator, 'calendar:prev', this.toPrev);
+//     this.listenTo(App.mediator, 'calendar:next', this.toNext);
+//     this.listenTo(App.mediator, 'calendar:today', this.toToday);
+//     this.listenTo(App.mediator, 'calendar:average', this.average);
+//     this.listenTo(App.mediator, 'calendar:changeAccount', this.onChangeAccount);
+//     this.listenTo(App.mediator, 'calendar:moveTo', this.moveTo);
+//   },
+//   render: function() {
+//     if(!this.current) return true;
 
-    var $tbody = this.$('tbody');
-    $tbody.empty();
+//     var $tbody = this.$('tbody');
+//     $tbody.empty();
 
-    var actions = this.collection.findActions(this.account, this.current);
-    var account = App.accounts.get(this.account);
-    var allActions = this.collection.findActions(this.account);
-    var defferenceTotal = 0;
+//     var actions = this.collection.findActions(this.account, this.current);
+//     var account = App.accounts.get(this.account);
+//     var allActions = this.collection.findActions(this.account);
+//     var defferenceTotal = 0;
 
-    App.sections.each(function(model) {
-      var actionView = new App.SectionActionView({
-        model: model,
-        actions: actions,
-        account: account
-      });
+//     App.sections.each(function(model) {
+//       var actionView = new App.SectionActionView({
+//         model: model,
+//         actions: actions,
+//         account: account
+//       });
 
-      $tbody.append(actionView.$el);
-      defferenceTotal += actionView.defference;
-    });
+//       $tbody.append(actionView.$el);
+//       defferenceTotal += actionView.defference;
+//     });
 
-    var totalClassName = defferenceTotal > 0? "incomeAmount": "expendAmount";
-    $tbody.append('<tr><td>予算との差の合計</td><td></td><td></td><td class="' + totalClassName + '"><strong>' +
-      App.formatAmount(defferenceTotal) + '</strong></td></tr>');
-  },
-  average: function(firstYear, firstMonth, finishYear, finishMonth) {
-    if(!(firstYear&&firstMonth&&finishYear&&finishMonth)) return true;
+//     var totalClassName = defferenceTotal > 0? "incomeAmount": "expendAmount";
+//     $tbody.append('<tr><td>予算との差の合計</td><td></td><td></td><td class="' + totalClassName + '"><strong>' +
+//       App.formatAmount(defferenceTotal) + '</strong></td></tr>');
+//   },
+//   average: function(firstYear, firstMonth, finishYear, finishMonth) {
+//     if(!(firstYear&&firstMonth&&finishYear&&finishMonth)) return true;
 
-    var $tbody = this.$('tbody');
+//     var $tbody = this.$('tbody');
 
-    var firstDate = moment({y: firstYear, M: firstMonth-1});
-    var finishDate = moment({y: finishYear, M: finishMonth-1});
+//     var firstDate = moment({y: firstYear, M: firstMonth-1});
+//     var finishDate = moment({y: finishYear, M: finishMonth-1});
 
-    $tbody.empty();
+//     $tbody.empty();
 
-    var actions = [];
-    var allActions = [];
-    var account = App.accounts.get(this.account);
-    for(var currentDate = firstDate,number = 0; currentDate <= finishDate; currentDate.add(1, 'month') ) {
-      console.log(moment(currentDate).format('YYYY-MM'));
-      //actions.push(this.collection.findActions(this.account, currentDate));
-      allActions = allActions.concat(this.collection.findActions(this.account, currentDate));
-      number++;
-    }
-    // console.log(number);
-    // actions = allActions;
-    // var totalIncome = 0;
-    // var totalExpend = 0;
-    // var total = 0;
-    // var aveIncome = 0;
-    // var aveExpend = 0;
-    // var aveTotal = 0;
-    // var allTotal = 0;
-    // var sign = '';
+//     var actions = [];
+//     var allActions = [];
+//     var account = App.accounts.get(this.account);
+//     for(var currentDate = firstDate,number = 0; currentDate <= finishDate; currentDate.add(1, 'month') ) {
+//       console.log(moment(currentDate).format('YYYY-MM'));
+//       //actions.push(this.collection.findActions(this.account, currentDate));
+//       allActions = allActions.concat(this.collection.findActions(this.account, currentDate));
+//       number++;
+//     }
+//     // console.log(number);
+//     // actions = allActions;
+//     // var totalIncome = 0;
+//     // var totalExpend = 0;
+//     // var total = 0;
+//     // var aveIncome = 0;
+//     // var aveExpend = 0;
+//     // var aveTotal = 0;
+//     // var allTotal = 0;
+//     // var sign = '';
 
-    // _.each(actions, function(model) {
+//     // _.each(actions, function(model) {
 
-    //   var amount = Number(model.get('amount'));
+//     //   var amount = Number(model.get('amount'));
 
-    //   if(model.get('isIncome')) {
-    //     totalIncome += amount;
-    //   } else {
-    //     totalExpend += amount;
-    //   }
+//     //   if(model.get('isIncome')) {
+//     //     totalIncome += amount;
+//     //   } else {
+//     //     totalExpend += amount;
+//     //   }
 
-    // });
-    // total = totalIncome - totalExpend;
+//     // });
+//     // total = totalIncome - totalExpend;
 
-    // aveIncome = parseInt(totalIncome/number);
-    // aveExpend = parseInt(totalExpend/number);
-    // aveTotal = parseInt(total/number);
+//     // aveIncome = parseInt(totalIncome/number);
+//     // aveExpend = parseInt(totalExpend/number);
+//     // aveTotal = parseInt(total/number);
 
-    // sign = total < 0 ? 'expendAmount' : 'incomeAmount';
-    // $tbody.append('<tr><td>月平均残額</td><td class="' + sign + '">' + App.formatAmount(aveTotal) + '</td></tr>');
+//     // sign = total < 0 ? 'expendAmount' : 'incomeAmount';
+//     // $tbody.append('<tr><td>月平均残額</td><td class="' + sign + '">' + App.formatAmount(aveTotal) + '</td></tr>');
 
-    // $tbody.append('<tr><td>月平均収入</td><td class="incomeAmount">' + App.formatAmount(aveIncome) + '</td></tr>');
+//     // $tbody.append('<tr><td>月平均収入</td><td class="incomeAmount">' + App.formatAmount(aveIncome) + '</td></tr>');
 
-    // $tbody.append('<tr><td>月平均支出</td><td class="expendAmount">' + App.formatAmount(aveExpend) + '</td></tr>');
+//     // $tbody.append('<tr><td>月平均支出</td><td class="expendAmount">' + App.formatAmount(aveExpend) + '</td></tr>');
 
-    // _.each(allActions, function(model) {
-    //   allTotal += Number(model.get('isIncome')? model.get('amount'): 0-model.get('amount'));
-    // });
-    // sign = allTotal < 0 ? 'expendAmount' : 'incomeAmount';
-    // $tbody.append('<tr><td>全合計</td><td class="' + sign + '">' + App.formatAmount(allTotal) + '</td></tr>');
-  },
-  toPrev: function() {
-    this.current.subtract(1, 'month');
-    this.collection.model.prototype.defaults.date = this.current;
-    this.render();
-    App.router.navigate(this.current.format('YYYY/MM'));
-  },
-  toNext: function() {
-    this.current.add(1, 'month');
-    this.collection.model.prototype.defaults.date = this.current;
-    this.render();
-    App.router.navigate(this.current.format('YYYY/MM'));
-  },
-  toToday: function() {
-    this.current = moment();
-    this.collection.model.prototype.defaults.date = this.current;
-    this.render();
-    App.router.navigate('');
-  },
-  moveTo: function(year, month) {
-    this.current = moment({ year: year, month: month - 1 });
-    this.collection.model.prototype.defaults.date = this.current;
-    this.render();
-  },
-  onChangeAccount: function(account) {
-    this.account = account;
-    this.render();
-  }
-});
+//     // _.each(allActions, function(model) {
+//     //   allTotal += Number(model.get('isIncome')? model.get('amount'): 0-model.get('amount'));
+//     // });
+//     // sign = allTotal < 0 ? 'expendAmount' : 'incomeAmount';
+//     // $tbody.append('<tr><td>全合計</td><td class="' + sign + '">' + App.formatAmount(allTotal) + '</td></tr>');
+//   },
+//   toPrev: function() {
+//     this.current.subtract(1, 'month');
+//     this.collection.model.prototype.defaults.date = this.current;
+//     this.render();
+//     App.router.navigate(this.current.format('YYYY/MM'));
+//   },
+//   toNext: function() {
+//     this.current.add(1, 'month');
+//     this.collection.model.prototype.defaults.date = this.current;
+//     this.render();
+//     App.router.navigate(this.current.format('YYYY/MM'));
+//   },
+//   toToday: function() {
+//     this.current = moment();
+//     this.collection.model.prototype.defaults.date = this.current;
+//     this.render();
+//     App.router.navigate('');
+//   },
+//   moveTo: function(year, month) {
+//     this.current = moment({ year: year, month: month - 1 });
+//     this.collection.model.prototype.defaults.date = this.current;
+//     this.render();
+//   },
+//   onChangeAccount: function(account) {
+//     this.account = account;
+//     this.render();
+//   }
+// });
 
-App.ActionView = Backbone.View.extend({
-  tagName: 'tr',
-  template:
-    '<td class="date"><%= model.formatDate("YYYY/MM/DD") %> (<span class="<%= day %>"><%= day %></span>)</td>' +
-    '<td class="section"><%= section %></td>' +
-    '<td class="subsection"><%= subsection %></td>' +
-    '<td class="<%= isIncome? "incomeAmount": "expendAmount" %>"><%= model.formatAmount() %></td>' +
-    '<td class="detail"><%= model.get("detail") %></td>' +
-    '<td class="way"><%= way %></td>' +
-    '<td class="debitDay"><%= model.formatDebitDay("YYYY/MM/DD") %></td>' +
-    '<td class="shop"><%= model.get("shop") %></td>',
+// App.ActionView = Backbone.View.extend({
+//   tagName: 'tr',
+//   template:
+//     '<td class="date"><%= model.formatDate("YYYY/MM/DD") %> (<span class="<%= day %>"><%= day %></span>)</td>' +
+//     '<td class="section"><%= section %></td>' +
+//     '<td class="subsection"><%= subsection %></td>' +
+//     '<td class="<%= isIncome? "incomeAmount": "expendAmount" %>"><%= model.formatAmount() %></td>' +
+//     '<td class="detail"><%= model.get("detail") %></td>' +
+//     '<td class="way"><%= way %></td>' +
+//     '<td class="debitDay"><%= model.formatDebitDay("YYYY/MM/DD") %></td>' +
+//     '<td class="shop"><%= model.get("shop") %></td>',
 
-  initialize: function() {
-    this.render();
-  },
-  events: {
-    'click': 'onClick'
-  },
-  render: function() {
-    var html = _.template(this.template, {
-      model: this.model,
-      day: this.model.formatDate("ddd"),
-      section: App.sections.get(this.model.get('section')).get('name'),
-      subsection: App.subsections.get(this.model.get('subsection')).get('name'),
-      way: App.ways.get(this.model.get('way')).get('name'),
-      isIncome: this.model.get('isIncome')
-    });
+//   initialize: function() {
+//     this.render();
+//   },
+//   events: {
+//     'click': 'onClick'
+//   },
+//   render: function() {
+//     var html = _.template(this.template, {
+//       model: this.model,
+//       day: this.model.formatDate("ddd"),
+//       section: App.sections.get(this.model.get('section')).get('name'),
+//       subsection: App.subsections.get(this.model.get('subsection')).get('name'),
+//       way: App.ways.get(this.model.get('way')).get('name'),
+//       isIncome: this.model.get('isIncome')
+//     });
 
-    this.$el.html(html);
-  },
-  onClick: function(){
-    App.mediator.trigger('dialog:open', this.model);
-  }
-});
+//     this.$el.html(html);
+//   },
+//   onClick: function(){
+//     App.mediator.trigger('dialog:open', this.model);
+//   }
+// });
 
-App.SectionActionView = Backbone.View.extend({
-  tagName: 'tr',
-  initialize: function(options) {
-    this.actions = options.actions;
-    this.account = options.account;
-    this.render();
-  },
-  events: {
-    'click': 'onClick'
-  },
-  render: function(options) {
-    var section = this.model;
-    var sectionName = section.get('name');
-    var sectionClassName = section.get('isIncome')? "incomeAmount": "expendAmount";
-    var subsectionList = {};
-    var subsections = App.subsections.select(function(model) {
-      return model.get('parent') === section.id;
-    });
-    _.each(subsections, function(model) {
-      subsectionList[model.id] = 0;
-    });
+// App.SectionActionView = Backbone.View.extend({
+//   tagName: 'tr',
+//   initialize: function(options) {
+//     this.actions = options.actions;
+//     this.account = options.account;
+//     this.render();
+//   },
+//   events: {
+//     'click': 'onClick'
+//   },
+//   render: function(options) {
+//     var section = this.model;
+//     var sectionName = section.get('name');
+//     var sectionClassName = section.get('isIncome')? "incomeAmount": "expendAmount";
+//     var subsectionList = {};
+//     var subsections = App.subsections.select(function(model) {
+//       return model.get('parent') === section.id;
+//     });
+//     _.each(subsections, function(model) {
+//       subsectionList[model.id] = 0;
+//     });
 
-    var sum = 0;
-    _.each(this.actions, function(model){
-      if(model.get('section') === section.id) {
-        sum += Number(model.get('amount'));
-        subsectionList[model.get('subsection')] += Number(model.get('amount'));
-      }
-    });
-    //console.log(this.account);
-    var budgetAmount = this.account.get('budgetAmounts')[section.id];
-    this.defference = section.get('isIncome')? sum-budgetAmount: budgetAmount-sum;
+//     var sum = 0;
+//     _.each(this.actions, function(model){
+//       if(model.get('section') === section.id) {
+//         sum += Number(model.get('amount'));
+//         subsectionList[model.get('subsection')] += Number(model.get('amount'));
+//       }
+//     });
+//     //console.log(this.account);
+//     var budgetAmount = this.account.get('budgetAmounts')[section.id];
+//     this.defference = section.get('isIncome')? sum-budgetAmount: budgetAmount-sum;
 
-    var actionView = $(
-      '<td class="' + sectionClassName + '">' + section.get('name') + '</td>' +
-      '<td><strong>' + App.formatAmount(sum) + '</strong></td>' +
-      '<td>' + App.formatAmount(budgetAmount) + '</td>' +
-      '<td>' + App.formatAmount(this.defference) + '</td>');
+//     var actionView = $(
+//       '<td class="' + sectionClassName + '">' + section.get('name') + '</td>' +
+//       '<td><strong>' + App.formatAmount(sum) + '</strong></td>' +
+//       '<td>' + App.formatAmount(budgetAmount) + '</td>' +
+//       '<td>' + App.formatAmount(this.defference) + '</td>');
 
-    var subsectionListView = $('<ul hidden>');
-    _.each(subsections, function(model){
-      var li =
-        '<li>' + model.get('name') + ':' + App.formatAmount(subsectionList[model.id]) + '</li>';
-      subsectionListView.append(li);
-    });
-    this.subsectionListView = subsectionListView;
-    actionView.filter('td:eq(1)').append(this.subsectionListView);
-    this.$el.append(actionView);
-  },
-  onClick: function(e){
-    e.stopPropagation();
-    console.log('m');
-    this.subsectionListView.toggle();
-  }
-});
+//     var subsectionListView = $('<ul hidden>');
+//     _.each(subsections, function(model){
+//       var li =
+//         '<li>' + model.get('name') + ':' + App.formatAmount(subsectionList[model.id]) + '</li>';
+//       subsectionListView.append(li);
+//     });
+//     this.subsectionListView = subsectionListView;
+//     actionView.filter('td:eq(1)').append(this.subsectionListView);
+//     this.$el.append(actionView);
+//   },
+//   onClick: function(e){
+//     e.stopPropagation();
+//     console.log('m');
+//     this.subsectionListView.toggle();
+//   }
+// });
 
 // ----------------------------------------------------------------------------------------
 
-App.CalendarControlView = Backbone.View.extend({
-  events: {
-    'click .calendar-incomeBtn': 'onClickIncome',
-    'click .calendar-expendBtn': 'onClickExpend',
-    'click .calendar-prevBtn': 'onClickPrev',
-    'click .calendar-nextBtn': 'onClickNext',
-    'click .calendar-todayBtn': 'onClickToday',
-    'click .calendar-averageBtn': 'onClickAverage',
-    'click .calendar-sectionBtn': 'onClickSection',
-    'click .calendar-subsectionBtn': 'onClickSubsection',
-    'click .calendar-accountBtn': 'onClickAccount',
-    'click .calendar-wayBtn': 'onClickWay'
-  },
-  initialize: function() {
-    $(window).on('keyup', {that: this}, this.onKeyup);
-  },
-  onClickIncome: function() {
-    var model = new this.collection.model();
-    model.set('isIncome', 1);
-    App.mediator.trigger('dialog:open', model);
-  },
-  onClickExpend: function() {
-    var model = new this.collection.model();
-    App.mediator.trigger('dialog:open', model);
-  },
-  onClickPrev: function() {
-    App.mediator.trigger('calendar:prev');
-  },
-  onClickNext: function() {
-    App.mediator.trigger('calendar:next');
-  },
-  onClickToday: function() {
-    App.mediator.trigger('calendar:today');
-  },
-  onClickAverage: function() {
-    App.mediator.trigger('calendar:average',
-      this.$el.find('.calendar-average-first-year').val(),
-      this.$el.find('.calendar-average-first-month').val(),
-      this.$el.find('.calendar-average-finish-year').val(),
-      this.$el.find('.calendar-average-finish-month').val()
-    );
-  },
-  onKeyup: function(e) {
-    if(e.keyCode == 112){
-      e.data.that.onClickIncome();
-    } else if(e.keyCode == 113){
-      e.data.that.onClickExpend();
-    }
-  },
-  onClickSection: function() {
-    App.mediator.trigger('sectionDialog:open');
-  },
-  onClickSubsection: function() {
-    App.mediator.trigger('subsectionDialog:open');
-  },
-  onClickAccount: function() {
-    App.mediator.trigger('accountDialog:open');
-  },
-  onClickWay: function() {
-    App.mediator.trigger('wayDialog:open');
-  }
-});
+// App.CalendarControlView = Backbone.View.extend({
+//   events: {
+//     'click .calendar-incomeBtn': 'onClickIncome',
+//     'click .calendar-expendBtn': 'onClickExpend',
+//     'click .calendar-prevBtn': 'onClickPrev',
+//     'click .calendar-nextBtn': 'onClickNext',
+//     'click .calendar-todayBtn': 'onClickToday',
+//     'click .calendar-averageBtn': 'onClickAverage',
+//     'click .calendar-sectionBtn': 'onClickSection',
+//     'click .calendar-subsectionBtn': 'onClickSubsection',
+//     'click .calendar-accountBtn': 'onClickAccount',
+//     'click .calendar-wayBtn': 'onClickWay'
+//   },
+//   initialize: function() {
+//     $(window).on('keyup', {that: this}, this.onKeyup);
+//   },
+//   onClickIncome: function() {
+//     var model = new this.collection.model();
+//     model.set('isIncome', 1);
+//     App.mediator.trigger('dialog:open', model);
+//   },
+//   onClickExpend: function() {
+//     var model = new this.collection.model();
+//     App.mediator.trigger('dialog:open', model);
+//   },
+//   onClickPrev: function() {
+//     App.mediator.trigger('calendar:prev');
+//   },
+//   onClickNext: function() {
+//     App.mediator.trigger('calendar:next');
+//   },
+//   onClickToday: function() {
+//     App.mediator.trigger('calendar:today');
+//   },
+//   onClickAverage: function() {
+//     App.mediator.trigger('calendar:average',
+//       this.$el.find('.calendar-average-first-year').val(),
+//       this.$el.find('.calendar-average-first-month').val(),
+//       this.$el.find('.calendar-average-finish-year').val(),
+//       this.$el.find('.calendar-average-finish-month').val()
+//     );
+//   },
+//   onKeyup: function(e) {
+//     if(e.keyCode == 112){
+//       e.data.that.onClickIncome();
+//     } else if(e.keyCode == 113){
+//       e.data.that.onClickExpend();
+//     }
+//   },
+//   onClickSection: function() {
+//     App.mediator.trigger('sectionDialog:open');
+//   },
+//   onClickSubsection: function() {
+//     App.mediator.trigger('subsectionDialog:open');
+//   },
+//   onClickAccount: function() {
+//     App.mediator.trigger('accountDialog:open');
+//   },
+//   onClickWay: function() {
+//     App.mediator.trigger('wayDialog:open');
+//   }
+// });
 
-App.AccountControlView = Backbone.View.extend({
-  events: {
-    'click button': 'onClickBtn',
-  },
-  initialize: function() {
-    this.listenTo(this.collection, 'change remove', this.close);
-    this.listenTo(this.collection, 'invalid', this.onError);
-    this.listenTo(App.mediator, 'dialog:open', this.open);
-    this.render();
-  },
-  render: function() {
-    var buttonTags = '';
-    this.collection.each(function(model) {
-      buttonTags += '<button class="" value="' + model.id + '">' + model.get('name') +'</button>';
-    });
-    buttonTags += '<button class="" value="all">すべて</button>';
-    this.$el.html(buttonTags);
-  },
-  onClickBtn: function(e) {
-    this.changeAccount(e.target.value);
-  },
-  changeAccount: function(id) {
-    var account = this.collection.at(0)? this.collection.at(0).id: null;
-    this.account = id || account ;
-    var $buttons = this.$('button').removeClass('active');
-    $buttons.filter('[value="' + this.account + '"]').addClass('active');
-    this.account = (this.account === 'all')? null: this.account;
-    App.mediator.trigger('calendar:changeAccount', this.account);
-  }
-});
+// App.AccountControlView = Backbone.View.extend({
+//   events: {
+//     'click button': 'onClickBtn',
+//   },
+//   initialize: function() {
+//     this.listenTo(this.collection, 'change remove', this.close);
+//     this.listenTo(this.collection, 'invalid', this.onError);
+//     this.listenTo(App.mediator, 'dialog:open', this.open);
+//     this.render();
+//   },
+//   render: function() {
+//     var buttonTags = '';
+//     this.collection.each(function(model) {
+//       buttonTags += '<button class="" value="' + model.id + '">' + model.get('name') +'</button>';
+//     });
+//     buttonTags += '<button class="" value="all">すべて</button>';
+//     this.$el.html(buttonTags);
+//   },
+//   onClickBtn: function(e) {
+//     this.changeAccount(e.target.value);
+//   },
+//   changeAccount: function(id) {
+//     var account = this.collection.at(0)? this.collection.at(0).id: null;
+//     this.account = id || account ;
+//     var $buttons = this.$('button').removeClass('active');
+//     $buttons.filter('[value="' + this.account + '"]').addClass('active');
+//     this.account = (this.account === 'all')? null: this.account;
+//     App.mediator.trigger('calendar:changeAccount', this.account);
+//   }
+// });
 
 // ----------------------------------------------------------------------------------------
 
 App.FormDialogView = Backbone.View.extend({
   events: {
-    'click': 'onClickDialog',
-    'submit form': 'onSubmit',
+    // 'click': 'onClickDialog',
+    'submit': 'onSubmit',
     'click .dialog-close': 'close',
     'click .dialog-removeBtn': 'onRemove',
     'click .dialog-copyBtn': 'onCopy',
@@ -526,22 +490,17 @@ App.FormDialogView = Backbone.View.extend({
   initialize: function(options) {
     $(window).on('keyup', {that: this}, this.onKeyup);
     this.listenTo(this.collection, 'remove', this.close);
+    this.listenTo(this.collection, 'add', this.addModel);
     this.listenTo(this.collection, 'invalid', this.onError);
     this.listenTo(App.mediator, 'dialog:open', this.open);
     this.subsectionSelectTagView = new App.FormSelectTagView({
       el: options.el + ' select[name="subsection"]',
       collection: App.subsections
     });
+    this.model = new this.collection.model();
+    this.render();
   },
   render: function() {
-    //this.collection.model.prototype.defaults.section = this.$('select[name="section"]').find('option')[0].value;
-    //this.collection.model.prototype.defaults.subsection = this.$('select[name="subsection"]').find('option')[0].value;
-    //this.collection.model.prototype.defaults.way = this.$('select[name="way"]').find('option')[0].value;
-
-    //this.$('select[name="section"]').find('option').eq(0).prop('selected', true);
-    //this.$('select[name="subsection"]').find('option').eq(0).prop('selected', true);
-    //this.$('select[name="account"]').find('option').eq(0).prop('selected', true);
-    //this.$('select[name="way"]').find('option').eq(0).prop('selected', true);
 
     this.$('.title').text(this.model.get('isIncome')? '収入の入力': '支出の入力');
     this.$('input[name="amount"]').val(this.model.get('amount'));
@@ -574,7 +533,11 @@ App.FormDialogView = Backbone.View.extend({
   close: function() {
     this.$el.hide();
   },
+  addModel: function() {
+    alert('登録しました。');
+  },
   onSubmit: function(e) {
+    console.log('kakunin');
     e.preventDefault();
 
     var amount = this.$('input[name="amount"]').val();
@@ -667,7 +630,6 @@ App.FormDialogView = Backbone.View.extend({
     this.$('input[name="debitDay"]').val(debitDay.format('YYYY-MM-DD'));
   },
   onFocusAmount: function(){
-    console.log('もち');
     App.mediator.trigger('calculator:open');
   },
   onBlurAmount: function(){

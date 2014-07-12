@@ -1,0 +1,97 @@
+body {
+  font-size: 18px;
+}
+
+input,
+select,
+button {
+  border-radius: 4px;
+  border: 1px solid #aaa;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
+  font-size: 1.2em;
+  padding: 2px 10px;
+}
+
+input[submit],
+input[button],
+button {
+  border-color: rgba(0, 0, 0, 0.5);
+  background: #eee;
+  -webkit-box-shadow: 0 0 0 1px #fff inset;
+  box-shadow: 0 0 0 1px #fff inset;
+}
+
+.page-containner {
+  display: none;
+}
+
+.page-containner.active {
+  display: block;
+}
+
+.page-containner .header {
+  position: relative;
+  background: #81cf7e;
+}
+
+.page-containner > .header .title {
+  text-align: center;
+  padding: 15px 20%;
+  line-height: 1.1em;
+  font-size: 1.4em;
+  color: #fff;
+}
+
+.page-containner > .header .btn-left,
+.page-containner > .header .btn-right {
+  position: absolute;
+  top: 5px;
+  border-color: #fff;
+  background-color: #fff;
+  color: #81cf7e;
+}
+
+.page-containner > .header .btn-left {
+  left: 10px;
+}
+.page-containner > .header .btn-right {
+  right: 10px;
+}
+.page-containner .body {
+  padding: 15px;
+}
+
+.p-input {
+  line-height: 2.5em;
+}
+
+.box-input label {
+  display: inline-block;
+  width: 20%;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+.box-input input {
+  width: 70%;
+  vertical-align: middle;
+}
+.box-input select {
+  width: 75%;
+  vertical-align: middle;
+}
+
+.box-submit {
+  padding: 20px 0 10px;
+}
+.btn-submit {
+  display: block;
+  width: 100%;
+  line-height: 2.0em;
+}
+
+/*-----*/
+
+.hidden {
+  display: none !important;
+}

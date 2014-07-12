@@ -13,6 +13,7 @@ if (!isset($_SESSION["USERIDREC"])) {
   <head>
     <meta charset="utf-8">
     <title>Backbone Household Acount Book</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/app.css">
     <script src="js/lib/jquery-2.0.3.js"></script>
     <script src="js/lib/underscore.js"></script>
@@ -22,6 +23,8 @@ if (!isset($_SESSION["USERIDREC"])) {
     <script src="js/model.js"></script>
     <script src="js/view.js"></script>
     <script src="js/helper.js"></script>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
   </head>
   <body>
 <p id="login-info">こんにちは、<?= $_SESSION["NAME"] ?>さん <a href="logout.php">ログアウト</a></p>
@@ -226,6 +229,30 @@ if (!isset($_SESSION["USERIDREC"])) {
       </form>
     </div>
   </div>
+</div>
+
+<div id="calculator" hidden>
+  <div class="nums">
+    <button type="button" class="num" value="1">1</button>
+    <button type="button" class="num" value="2">2</button>
+    <button type="button" class="num" value="3">3</button>
+    <button type="button" class="num" value="4">4</button>
+    <button type="button" class="num" value="5">5</button>
+    <button type="button" class="num" value="6">6</button>
+    <button type="button" class="num" value="7">7</button>
+    <button type="button" class="num" value="8">8</button>
+    <button type="button" class="num" value="9">9</button>
+    <button type="button" class="num" value="0">0</button>
+    <button type="button" class="num" value="00">00</button>
+  </div>
+  <div class="ops">
+    <button  type="button"class="op" value="add">+</button>
+    <button type="button" class="op" value="subtract">-</button>
+    <button type="button" class="op" value="multiple">×</button>
+    <button type="button" class="op" value="divid">÷</button>
+  </div>
+    <button type="button" class="clear" value="clear">C</button>
+    <button type="button" class="result" value="result">=</button>
 </div>
   <!-- <form class="filterForm">
     <h3>フィルタ</h3>
