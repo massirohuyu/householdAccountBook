@@ -28,6 +28,7 @@ if (!isset($_SESSION["USERIDREC"])) {
   </head>
   <body>
 <p id="login-info">こんにちは、<?= $_SESSION["NAME"] ?>さん <a href="logout.php">ログアウト</a></p>
+<input id="account" type="hidden" value="<?= $_SESSION["ACCOUNT"] ?>">
 <div class="calendarContainer">
   <div class="account-control">
   </div>
@@ -91,6 +92,11 @@ if (!isset($_SESSION["USERIDREC"])) {
     <div class="dialog-content"></div>
       <h2 class="title">収支の入力</h2>
       <form>
+        <div class="dialog-controll">
+          <input type="submit" value="Save">
+          <button class="dialog-copyBtn">Copy</button>
+          <button class="dialog-removeBtn">Remove</button>
+        </div>
         <h3>日付</h3>
         <p><input type="date" name="date"></p>
 
@@ -244,6 +250,7 @@ if (!isset($_SESSION["USERIDREC"])) {
     <button type="button" class="num" value="9">9</button>
     <button type="button" class="num" value="0">0</button>
     <button type="button" class="num" value="00">00</button>
+    <button type="button" class="tax" value="0.08">税</button>
   </div>
   <div class="ops">
     <button  type="button"class="op" value="add">+</button>

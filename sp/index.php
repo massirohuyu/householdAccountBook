@@ -28,10 +28,11 @@ if (!isset($_SESSION["USERIDREC"])) {
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
   </head>
   <body>
+    <input id="account" type="hidden" value="<?= $_SESSION["ACCOUNT"] ?>">
     <div id="page-input-record" class="active page-containner">
       <header class="header">
         <h1 class="title">支出入力</h1>
-        <button class="btn-left">戻る</button>
+        <button class="btn-left" onClick="location = '../'">戻る</button>
         <button class="btn-right">履歴</button>
       </header>
       <div class="body">

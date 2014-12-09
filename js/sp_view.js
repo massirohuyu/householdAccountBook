@@ -498,6 +498,8 @@ App.FormDialogView = Backbone.View.extend({
       collection: App.subsections
     });
     this.model = new this.collection.model();
+    var account = $('#account').val();
+    if(account) this.model.set('account', account);
     this.render();
   },
   render: function() {

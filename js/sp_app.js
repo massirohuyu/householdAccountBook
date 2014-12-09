@@ -6,7 +6,7 @@ $(function() {
 //各modelを作成
 
   var actions = new App.Actions();
-  var actionsPromise = actions.fetch();
+  //var actionsPromise = actions.fetch();
 
   var sections = new App.SectionsList();
   App.sections = sections;
@@ -124,7 +124,7 @@ $(function() {
   });
 
 //各modelすべての読み込みが終わったら、routerを生成、hash制御？も開始
-  $.when(actionsPromise, sectionsPromise, subsectionsPromise, accountsPromise, waysPromise, shopsPromise)
+  $.when(sectionsPromise, subsectionsPromise, accountsPromise, waysPromise, shopsPromise)
   .then(function() {
     App.router = new Router();
     Backbone.history.start();

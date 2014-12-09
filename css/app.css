@@ -167,7 +167,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  background: rgba(0, 0, 0, 0.4);
+  /*background: rgba(0, 0, 0, 0.4);*/
 }
 
 .dialog .dialog-body {
@@ -178,7 +178,8 @@
   border-radius: 6px;
   padding: 15px;
   margin: 50px auto 0;
-  background: #FFF;
+  background: #fff;
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.2);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
@@ -309,7 +310,8 @@
     font-size: 20px;
   }
 
-  #input-dialog {
+  #input-dialog,
+  #login-dialog {
     /*display: block;*/
     position: absolute;
     top: 0;
@@ -317,7 +319,8 @@
     right: 0;
   }
 
-  #input-dialog .dialog-body {
+  #input-dialog .dialog-body,
+  #login-dialog .dialog-body {
     position: absolute;
     margin: 0;
     width: auto;

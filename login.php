@@ -1,4 +1,5 @@
 <?php
+  session_set_cookie_params(60*60*24*30, '');//一ヶ月
   session_start();
   header("Content-type: text/html; charset=utf-8");
 
@@ -18,6 +19,7 @@
       session_regenerate_id(TRUE);
       $_SESSION["USERIDREC"] = $_POST["useridrec"];
       $_SESSION["NAME"] = $userlist["users"][$_POST["useridrec"]]["name"];
+      $_SESSION["ACCOUNT"] = $userlist["users"][$_POST["useridrec"]]["account"];
 
       $ua=$_SERVER['HTTP_USER_AGENT'];
 

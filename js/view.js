@@ -1095,6 +1095,7 @@ App.ShopButtonView = Backbone.View.extend({
 App.Calculator = Backbone.View.extend({
   events: {
     'click .num': 'onClickNum',
+    'click .tax': 'onClickTax',
     'click .op': 'onClickOp',
     'click .clear': 'onClickClear',
     'click .result': 'onClickResult'
@@ -1122,6 +1123,12 @@ App.Calculator = Backbone.View.extend({
     } else {
       this.$input.val(Number(String(inputNum)+num));//ディスプレイの後ろにプラス
     }
+  },
+  onClickTax: function(e) {
+    var num = Number(e.target.value) + 1; //押した税率 + 1
+    var inputNum = Number(this.$input.val()); //ディスプレイの数字
+    this.$input.val(Math.floor(inputNum*num));//税率＋したものをディスプレイに表示
+    this.$input.focus();
   },
   onClickOp: function(e) {
     this.calculation();
